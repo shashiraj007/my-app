@@ -19,7 +19,7 @@ spec:
         image: shashi64/my-app-1.0
         imagePullPolicy: Always
         ports:
-        - containerPort: 8080
+        - containerPort: 8085
           name: http
           protocol: TCP
 # service type loadbalancer       
@@ -36,7 +36,7 @@ spec:
   - name: http
     port: 80
     protocol: TCP
-    targetPort: 8080
+    targetPort: 8085
   type: LoadBalancer
   selector:
     app: my-app-1.0
