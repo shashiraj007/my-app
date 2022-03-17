@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app-1.0
+  name: my-app-1.0
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app-1.0
+  template:
+    metadata:
+      labels:
+        app: my-app-1.0
+    spec:
+      containers:
+      - name: my-app-1.0
+        image: shashi64/my-app-1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+# service type loadbalancer       
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: my-app-1.0
+    k8s-app: my-app-1.0
+  name: my-app-1.0
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8085
+  type: LoadBalancer
