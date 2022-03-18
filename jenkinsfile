@@ -1,0 +1,49 @@
+pipeline {
+    agent any
+     tools {
+         maven "maven3.6.3"
+    }
+        environment {
+        registry = "shashi64/my-app-1.0"
+        registryCredential ='dockerhub_id'
+        dockerImage = ''
+    }
+        stages {
+        stage('Cloning Git') {
+            steps {
+                 checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/shashiraj007/my-app.git']]])
+            }
+        }
+        stage ('Build') {
+            steps {
+            sh "mvn clean install"      
+            }
+        } 
+        stage('Building image') {
+            steps{
+            script {
+            dockerImage = docker.build registry 
+        }
+        }
+        }
+          stage('Upload Image') {
+     steps{   
+         script {
+                  docker.withRegistry( '', registryCredential ) {
+                  dockerImage.push()
+            }
+        }
+      }
+    }
+          stage('k8s deploy'){
+              steps{
+              withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s-shashi', namespace: '', serverUrl: '') {
+              sh "kubectl apply -f deployment.yaml"
+ 
+         }
+              
+              
+          }
+}
+}
+}
